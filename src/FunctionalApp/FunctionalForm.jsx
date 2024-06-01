@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { ErrorMessage } from "../ErrorMessage";
+
 import { allCities } from "../utils/all-cities";
 import { isEmailValid } from "../utils/validations";
 import isCityValid from "../utils/isCityValid";
 import { FunctionalPhoneInput } from "./FunctionPhoneInput";
 import { FunctionalTextInput } from "./FunctionTextInput";
-
+import { ErrorMessage } from "../ErrorMessage";
 const firstNameErrorMessage = "First name must be at least 2 characters long";
 const lastNameErrorMessage = "Last name must be at least 2 characters long";
 const emailErrorMessage = "Email is Invalid";
@@ -46,6 +46,15 @@ export const FunctionalForm = ({ setUserData }) => {
     }
   };
 
+  const resetSetInputs = () => {
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setCity("");
+    setInputs(["", "", "", ""]);
+    setIsSubmitted(false);
+  };
+
   const handleSubmit = () => {
     setIsSubmitted(true);
     const phone = inputs.join("");
@@ -56,43 +65,24 @@ export const FunctionalForm = ({ setUserData }) => {
       city.length > 0 &&
       phone.length === 7
     ) {
-      const userData = { firstName, lastName, email, city, phone };
+      const userData = {
+        firstName,
+        lastName,
+        email,
+        city,
+        phone,
+      };
       setUserData(userData);
-      // Clear the input fields
-      setFirstName("");
-      setLastName("");
-      setEmail("");
-      setCity("");
-      setInputs(["", "", "", ""]);
-      setIsSubmitted(false);
+      resetSetInputs();
     } else {
       alert("Bad data input");
-    }
-  };
-
-  const handleChange = (field, value) => {
-    switch (field) {
-      case "firstName":
-        setFirstName(value);
-        break;
-      case "lastName":
-        setLastName(value);
-        break;
-      case "email":
-        setEmail(value);
-        break;
-      case "city":
-        setCity(value);
-        break;
-      default:
-        break;
     }
   };
 
   const isFirstNameValid = isSubmitted && firstName.length < 2;
   const isLastNameValid = isSubmitted && lastName.length < 2;
   const isEmailValidated = isSubmitted && !isEmailValid(email);
-  const isCityValidated = isSubmitted && isCityValid(city);
+  const isCityValidated = isSubmitted && !isCityValid(city);
   const totalPhoneInput = inputs.join("").length;
   const isPhoneNumberValid = isSubmitted && totalPhoneInput !== 7;
 
@@ -108,36 +98,37 @@ export const FunctionalForm = ({ setUserData }) => {
       </u>
 
       {/* first name input */}
-      <div className="input-wrap">
-        <FunctionalTextInput
-          label="First Name"
-          value={firstName}
-          onChange={(e) => handleChange("firstName", e.target.value)}
-          placeholder="Bilbo"
-        />
-      </div>
-      <ErrorMessage message={firstNameErrorMessage} show={isFirstNameValid} />
+
+      <FunctionalTextInput
+        label="First Name"
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+        placeholder="Bilbo"
+        isValid={isFirstNameValid}
+        errorMessage={firstNameErrorMessage}
+      />
+
       {/* last name input */}
-      <div className="input-wrap">
-        <FunctionalTextInput
-          label="Last Name"
-          value={lastName}
-          onChange={(e) => handleChange("lastName", e.target.value)}
-          placeholder="Baggins"
-        />
-      </div>
-      <ErrorMessage message={lastNameErrorMessage} show={isLastNameValid} />
+
+      <FunctionalTextInput
+        label="Last Name"
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
+        placeholder="Baggins"
+        isValid={isLastNameValid}
+        errorMessage={lastNameErrorMessage}
+      />
 
       {/* Email Input */}
-      <div className="input-wrap">
-        <FunctionalTextInput
-          label="Email"
-          value={email}
-          onChange={(e) => handleChange("email", e.target.value)}
-          placeholder="bilbo-baggins@adventurehobbits.net"
-        />
-      </div>
-      <ErrorMessage message={emailErrorMessage} show={isEmailValidated} />
+
+      <FunctionalTextInput
+        label="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="bilbo-baggins@adventurehobbits.net"
+        isValid={isEmailValidated}
+        errorMessage={emailErrorMessage}
+      />
 
       {/* City Input */}
       <div className="input-wrap">
@@ -160,20 +151,12 @@ export const FunctionalForm = ({ setUserData }) => {
       </div>
       <ErrorMessage message={cityErrorMessage} show={isCityValidated} />
 
-      <div className="input-wrap">
-        <label htmlFor="phone">Phone:</label>
-        <div id="phone-input-wrap">
-          <FunctionalPhoneInput
-            inputs={inputs}
-            handleInputChange={handleInputChange}
-            handleBackspace={handleBackspace}
-          />
-        </div>
-      </div>
-
-      <ErrorMessage
-        message={phoneNumberErrorMessage}
-        show={isPhoneNumberValid}
+      <FunctionalPhoneInput
+        inputs={inputs}
+        handleInputChange={handleInputChange}
+        handleBackspace={handleBackspace}
+        isValid={isPhoneNumberValid}
+        errorMessage={phoneNumberErrorMessage}
       />
 
       <input type="submit" value="Submit" />

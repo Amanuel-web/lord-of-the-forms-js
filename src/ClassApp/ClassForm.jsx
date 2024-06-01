@@ -1,6 +1,6 @@
 import { Component } from "react";
-import { ErrorMessage } from "../ErrorMessage";
 import { isEmailValid } from "../utils/validations";
+import { ErrorMessage } from "../ErrorMessage";
 import { ClassPhoneInput } from "./ClassPhoneInput";
 import { ClassTextInput } from "./ClassTextInput";
 import { allCities } from "../utils/all-cities";
@@ -9,7 +9,7 @@ import isCityValid from "../utils/isCityValid";
 const firstNameErrorMessage = "First name must be at least 2 characters long";
 const lastNameErrorMessage = "Last name must be at least 2 characters long";
 const emailErrorMessage = "Email is Invalid";
-const cityErrorMessage = "State is Invalid";
+const cityErrorMessage = "City is Invalid";
 const phoneNumberErrorMessage = "Invalid Phone Number";
 
 export class ClassForm extends Component {
@@ -22,36 +22,6 @@ export class ClassForm extends Component {
     inputs: ["", "", "", ""],
   };
 
-  // handleInputChange = (index, event) => {
-  //   const newInputs = [...this.state.inputsOfClass];
-  //   const value = event.target.value;
-
-  //   if (value === "" || /^[0-9]+$/.test(value)) {
-  //     newInputs[index] = value;
-  //     this.setState({ inputsOfClass: newInputs });
-
-  //     if (value.length === (index === 3 ? 1 : 2)) {
-  //       const nextInput = document.getElementById(`phone-input${index + 2}`);
-  //       if (nextInput) {
-  //         nextInput.focus();
-  //       }
-  //     }
-  //   }
-  // };
-
-  // handleBackspace = (index, event) => {
-  //   if (
-  //     event.key === "Backspace" &&
-  //     this.state.inputsOfClass[index].length === 0 &&
-  //     index > 0
-  //   ) {
-  //     const previousInput = document.getElementById(`phone-input${index}`);
-  //     if (previousInput) {
-  //       previousInput.focus();
-  //     }
-  //   }
-  // };
-
   handleInputChange = (index, event) => {
     const newInputs = [...this.state.inputs];
     const value = event.target.value;
@@ -60,8 +30,10 @@ export class ClassForm extends Component {
       newInputs[index] = value;
       this.setState({ inputs: newInputs });
 
-      if (value.length === (index === 3 ? 1 : 2)) {
-        const nextInput = document.getElementById(`phone-input${index + 2}`);
+      if (value.length === event.target.maxLength) {
+        const nextInput =
+          document.getElementById(`phone-input${index + 2}`) ||
+          document.querySelector(`.class-phone-input-${index + 2}`);
         if (nextInput) {
           nextInput.focus();
         }
@@ -75,39 +47,46 @@ export class ClassForm extends Component {
       this.state.inputs[index].length === 0 &&
       index > 0
     ) {
-      const previousInput = document.getElementById(`phone-input${index}`);
+      const previousInput =
+        document.getElementById(`phone-input${index}`) ||
+        document.querySelector(`.class-phone-input-${index}`);
       if (previousInput) {
         previousInput.focus();
       }
     }
   };
 
+  resetSetInputs = () => {
+    this.setState({
+      isSubmitted: false,
+      firstName: "",
+      lastName: "",
+      email: "",
+      city: "",
+      inputs: ["", "", "", ""],
+    });
+  };
+
   handleSubmit = () => {
     this.setState({ isSubmitted: true });
-    const phone = this.state.inputsOfClass.join("");
+    const phone = this.state.inputs.join("");
     const { firstName, lastName, email, city } = this.state;
     if (
       firstName.length >= 2 &&
       lastName.length >= 2 &&
       isEmailValid(email) &&
-      city.length > 0 &&
+      isCityValid(city) &&
       phone.length === 7
     ) {
       const userData = { firstName, lastName, email, city, phone };
       this.props.setUserData(userData);
 
-      this.setState({
-        isSubmitted: false,
-        firstName: "",
-        lastName: "",
-        email: "",
-        city: "",
-        inputsOfClass: ["", "", "", ""],
-      });
+      this.resetSetInputs();
     } else {
       alert("Bad data input");
     }
   };
+
   handleChange = (field, value) => {
     this.setState({ [field]: value });
   };
@@ -119,7 +98,7 @@ export class ClassForm extends Component {
     const isFirstNameValid = isSubmitted && firstName.length < 2;
     const isLastNameValid = isSubmitted && lastName.length < 2;
     const isEmailValidated = isSubmitted && !isEmailValid(email);
-    const isCityValidated = isSubmitted && isCityValid(city);
+    const isCityValidated = isSubmitted && !isCityValid(city);
     const totalPhoneInput = inputs.join("").length;
     const isPhoneNumberValid = isSubmitted && totalPhoneInput !== 7;
 
@@ -135,41 +114,41 @@ export class ClassForm extends Component {
         </u>
 
         {/* first name input */}
-        <div className="input-wrap">
-          <ClassTextInput
-            label="First Name"
-            value={firstName}
-            onChange={(e) => this.handleChange("firstName", e.target.value)}
-            placeholder="Bilbo"
-          />
-        </div>
-        <ErrorMessage message={firstNameErrorMessage} show={isFirstNameValid} />
+
+        <ClassTextInput
+          label="First Name"
+          value={firstName}
+          onChange={(e) => this.handleChange("firstName", e.target.value)}
+          placeholder="Bilbo"
+          isValid={isFirstNameValid}
+          errorMessage={firstNameErrorMessage}
+        />
 
         {/* last name input */}
-        <div className="input-wrap">
-          <ClassTextInput
-            label="Last Name"
-            value={lastName}
-            onChange={(e) => this.handleChange("lastName", e.target.value)}
-            placeholder="Baggins"
-          />
-        </div>
-        <ErrorMessage message={lastNameErrorMessage} show={isLastNameValid} />
+
+        <ClassTextInput
+          label="Last Name"
+          value={lastName}
+          onChange={(e) => this.handleChange("lastName", e.target.value)}
+          placeholder="Baggins"
+          isValid={isLastNameValid}
+          errorMessage={lastNameErrorMessage}
+        />
 
         {/* Email Input */}
-        <div className="input-wrap">
-          <ClassTextInput
-            label="Email"
-            value={email}
-            onChange={(e) => this.handleChange("email", e.target.value)}
-            placeholder="bilbo-baggins@adventurehobbits.net"
-          />
-        </div>
-        <ErrorMessage message={emailErrorMessage} show={isEmailValidated} />
+
+        <ClassTextInput
+          label="Email"
+          value={email}
+          onChange={(e) => this.handleChange("email", e.target.value)}
+          placeholder="bilbo-baggins@adventurehobbits.net"
+          isValid={isEmailValidated}
+          errorMessage={emailErrorMessage}
+        />
 
         {/* City Input */}
         <div className="input-wrap">
-          <label>{"City"}:</label>
+          <label>City:</label>
           <input
             placeholder="Hobbiton"
             list="cities"
@@ -188,20 +167,12 @@ export class ClassForm extends Component {
         </div>
         <ErrorMessage message={cityErrorMessage} show={isCityValidated} />
 
-        <div className="input-wrap">
-          <label htmlFor="phone">Phone:</label>
-          <div id="phone-input">
-            <ClassPhoneInput
-              inputs={inputs}
-              handleInputChange={this.handleInputChange}
-              handleBackspace={this.handleBackspace}
-            />
-          </div>
-        </div>
-
-        <ErrorMessage
-          message={phoneNumberErrorMessage}
-          show={isPhoneNumberValid}
+        <ClassPhoneInput
+          inputs={inputs}
+          handleInputChange={this.handleInputChange}
+          handleBackspace={this.handleBackspace}
+          isValid={isPhoneNumberValid}
+          errorMessage={phoneNumberErrorMessage}
         />
 
         <input type="submit" value="Submit" />

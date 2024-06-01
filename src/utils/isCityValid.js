@@ -1,7 +1,9 @@
 import { allCities } from "./all-cities";
 
 function isCityValid(city) {
-  return allCities.some((c) => c.toLowerCase() === city.toLowerCase());
+  return allCities.some(
+    (cityProps) => cityProps.toLowerCase() === city.toLowerCase()
+  );
 }
 
 export default isCityValid;

@@ -157,6 +157,26 @@ form label {
   text-align: center;
 }
 
+#phone-input1 {
+  width: 30px;
+}
+#phone-input2 {
+  width: 30px;
+}
+#phone-input3 {
+  width: 30px;
+}
+#phone-input4 {
+  width: 30px;
+}
+
+#phone-input1,
+#phone-input2,
+#phone-input3,
+#phone-input4 {
+  text-align: center;
+}
+
 #phone-input-wrap {
   display: flex;
   justify-content: space-between;
